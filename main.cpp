@@ -3,7 +3,7 @@
 
 int main() {
 
-    std::string fileNameToSaveGame = "../game.bin";
+    std::string fileNameToSaveGame = "../game.bin", command;
     std::vector<player> players;
     player tmpPlayer;
     bool correctInput;
@@ -59,5 +59,7 @@ int main() {
     players.push_back(tmpPlayer);
     GenerateEnemy(players);
     DisplayPole(players);
+    std::cout << "Input the command (left, right, top, bottom, save, load): ";
+    std::cin >> command;
     return 0;
 }
