@@ -1,5 +1,5 @@
 //
-// Created by kvitadmin on 23.08.2021.
+// Created by kvitadmin on 24.08.2021.
 //
 
 #ifndef HOMEWORK21_5_4_MAIN_H
@@ -8,6 +8,8 @@
 #include <string>
 #include <ctime>
 #include <array>
+#include <algorithm>
+#include <fstream>
 
 struct player{
     std::string name;
@@ -71,4 +73,21 @@ void DisplayPole(std::vector<player>& players){
 
 }
 
+bool CheckCommand(std::vector<std::string>& commandVector, std::string& command){
+    if(std::find(commandVector.begin(),commandVector.end(), command) == commandVector.end())
+        return false;
+    else return true;
+}
+
+bool SaveGame(std::vector<player>& players, std::string& fileName){
+    std::ofstream outFile(fileName, std::ios::binary);
+    if(!outFile.is_open()) return false;
+    else{
+        for(auto el : players){
+            outFile.write(reinterpret_cast<const char*>(&el), sizeof(player));
+        }
+        outFile.close();
+        return true;
+    }
+}
 #endif //HOMEWORK21_5_4_MAIN_H
