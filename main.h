@@ -83,8 +83,32 @@ bool SaveGame(std::vector<player>& players, std::string& fileName){
     std::ofstream outFile(fileName, std::ios::binary);
     if(!outFile.is_open()) return false;
     else{
+        for(int i = 0; i < players.size(); ++i){
+            outFile.write(players[i].name.c_str(), sizeof(players[i].name));
+            outFile.write(reinterpret_cast<char*>(&players[i].enemy), sizeof(players[i].enemy));
+            outFile.write(reinterpret_cast<char*>(&players[i].armor), sizeof(players[i].armor));
+            outFile.write(reinterpret_cast<char*>(&players[i].damage), sizeof(players[i].damage));
+            outFile.write(reinterpret_cast<char*>(&players[i].health), sizeof(players[i].health));
+            outFile.write(reinterpret_cast<char*>(&players[i].curX), sizeof(players[i].curX));
+            outFile.write(reinterpret_cast<char*>(&players[i].curY), sizeof(players[i].curY));
+        }
+        outFile.close();
+        return true;
+    }
+}
+
+bool LoadGame(std::vector<player>& players, std::string& fileName){
+    std::ifstream outFile(fileName, std::ios::binary);
+    if(!outFile.is_open()) return false;
+    else{
         for(auto el : players){
-            outFile.write(reinterpret_cast<const char*>(&el), sizeof(player));
+            outFile.read(const_cast<char*>(el.name.c_str()), sizeof(el.name));
+            outFile.read(reinterpret_cast<char*>(&el.enemy), sizeof(el.enemy));
+            outFile.read(reinterpret_cast<char*>(&el.armor), sizeof(el.armor));
+            outFile.read(reinterpret_cast<char*>(&el.damage), sizeof(el.damage));
+            outFile.read(reinterpret_cast<char*>(&el.health), sizeof(el.health));
+            outFile.read(reinterpret_cast<char*>(&el.curX), sizeof(el.curX));
+            outFile.read(reinterpret_cast<char*>(&el.curY), sizeof(el.curY));
         }
         outFile.close();
         return true;

@@ -71,7 +71,7 @@ int main() {
         if(!SaveGame(players, fileNameToSaveGame)) std::cout << "Can't save game to file!" << std::endl;
     }
     if(command == "load"){
-
+        if(!LoadGame(players, fileNameToSaveGame)) std::cout << "Can't save game to file!" << std::endl;
     }
     return 0;
 }
