@@ -82,7 +82,9 @@ int main() {
         if(command == "load"){
             if(!LoadGame(players, fileNameToSaveGame)) std::cout << "Can't load game from file!" << std::endl;
         }
-
+        ExecuteCommand(command, players);
+        DisplayPole(players);
+        CheckEndGame(endGame, players);
     }while(!endGame);
     return 0;
 }

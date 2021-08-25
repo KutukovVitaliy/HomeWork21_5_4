@@ -61,7 +61,7 @@ void DisplayPole(std::vector<player>& players){
         for(int j = 0; j < 40; ++j){
             bool curPos = true;
             for(auto el : players){
-                if(el.curX == j && el.curY == i){
+                if(el.curX == j && el.curY == i && el.health > 0){
                     if(el.enemy) {std::cout <<"E"; curPos = false; break;}
                     else {std::cout << "P"; curPos = false; break;}
                 }
@@ -122,7 +122,7 @@ bool LoadGame(std::vector<player>& players, std::string& fileName){
     }
 }
 void ExecuteCommand(std::string& command, std::vector<player>& players){
-    int x, y;
+    int x = players[0].curX, y = players[0].curY;
     if(command == "left"){
         x = players[0].curX - 1;
         if(x < 0){
@@ -153,8 +153,29 @@ void ExecuteCommand(std::string& command, std::vector<player>& players){
     }
     for(int i = 1; i < players.size(); ++i){
         if(players[i].curX == players[0].curX && players[i].curY == players[0].curY){
-
+            if(players[i].health <= 0) continue;
+            if(players[0].damage < players[i].armor){
+                players[i].armor -= players[0].damage;
+            }
+            else{
+                players[i].health += players[i].armor - players[0].damage;
+                if(players[i].health <= 0){
+                    std::cout << "enemy#" << i << " is killed!" << std::endl;
+                }
+            }
         }
+    }
+    players[0].curX = x;
+    players[0].curY = y;
+}
+void CheckEndGame(bool& endGame, std::vector<player>& players){
+    int sum = 5;
+    if(players[0].health <= 0) endGame = true;
+    else{
+        for(int i = 1; i < players.size(); ++i){
+            if(players[i].health <= 0) sum--;
+        }
+        if(!sum) endGame = true;
     }
 }
 #endif //HOMEWORK21_5_4_MAIN_H
