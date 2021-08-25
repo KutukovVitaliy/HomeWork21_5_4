@@ -84,13 +84,15 @@ bool SaveGame(std::vector<player>& players, std::string& fileName){
     if(!outFile.is_open()) return false;
     else{
         for(int i = 0; i < players.size(); ++i){
-            outFile.write(players[i].name.c_str(), sizeof(players[i].name));
-            outFile.write(reinterpret_cast<char*>(&players[i].enemy), sizeof(players[i].enemy));
-            outFile.write(reinterpret_cast<char*>(&players[i].armor), sizeof(players[i].armor));
-            outFile.write(reinterpret_cast<char*>(&players[i].damage), sizeof(players[i].damage));
-            outFile.write(reinterpret_cast<char*>(&players[i].health), sizeof(players[i].health));
-            outFile.write(reinterpret_cast<char*>(&players[i].curX), sizeof(players[i].curX));
-            outFile.write(reinterpret_cast<char*>(&players[i].curY), sizeof(players[i].curY));
+            int num = players[i].name.size();
+            outFile.write(reinterpret_cast<const char*>(&num), sizeof(num));
+            outFile.write(static_cast<const char*>(players[i].name.c_str()), players[i].name.size());
+            outFile.write(reinterpret_cast<const char*>(&players[i].enemy), sizeof(players[i].enemy));
+            outFile.write(reinterpret_cast<const char*>(&players[i].health), sizeof(players[i].health));
+            outFile.write(reinterpret_cast<const char*>(&players[i].damage), sizeof(players[i].damage));
+            outFile.write(reinterpret_cast<const char*>(&players[i].armor), sizeof(players[i].armor));
+            outFile.write(reinterpret_cast<const char*>(&players[i].curX), sizeof(players[i].curX));
+            outFile.write(reinterpret_cast<const char*>(&players[i].curY), sizeof(players[i].curY));
         }
         outFile.close();
         return true;
@@ -101,17 +103,58 @@ bool LoadGame(std::vector<player>& players, std::string& fileName){
     std::ifstream outFile(fileName, std::ios::binary);
     if(!outFile.is_open()) return false;
     else{
-        for(auto el : players){
-            outFile.read(const_cast<char*>(el.name.c_str()), sizeof(el.name));
-            outFile.read(reinterpret_cast<char*>(&el.enemy), sizeof(el.enemy));
-            outFile.read(reinterpret_cast<char*>(&el.armor), sizeof(el.armor));
-            outFile.read(reinterpret_cast<char*>(&el.damage), sizeof(el.damage));
-            outFile.read(reinterpret_cast<char*>(&el.health), sizeof(el.health));
-            outFile.read(reinterpret_cast<char*>(&el.curX), sizeof(el.curX));
-            outFile.read(reinterpret_cast<char*>(&el.curY), sizeof(el.curY));
+
+        for(int i = 0; i < players.size(); ++i){
+            char tmp[32]={0};
+            int num;
+            outFile.read((char*)&num, sizeof(num));
+            outFile.read(tmp, num);
+            players[i].name = tmp;
+            outFile.read(reinterpret_cast<char*>(&players[i].enemy), sizeof(players[i].enemy));
+            outFile.read(reinterpret_cast<char*>(&players[i].health), sizeof(players[i].health));
+            outFile.read(reinterpret_cast<char*>(&players[i].damage), sizeof(players[i].damage));
+            outFile.read(reinterpret_cast<char*>(&players[i].armor), sizeof(players[i].armor));
+            outFile.read(reinterpret_cast<char*>(&players[i].curX), sizeof(players[i].curX));
+            outFile.read(reinterpret_cast<char*>(&players[i].curY), sizeof(players[i].curY));
         }
         outFile.close();
         return true;
+    }
+}
+void ExecuteCommand(std::string& command, std::vector<player>& players){
+    int x, y;
+    if(command == "left"){
+        x = players[0].curX - 1;
+        if(x < 0){
+            std::cout << "Bad command. No free space!" << std::endl;
+            return;
+        }
+    }
+    if(command == "right"){
+        x = players[0].curX + 1;
+        if(x > 39){
+            std::cout << "Bad command. No free space!" << std::endl;
+            return;
+        }
+    }
+    if(command == "top"){
+        y = players[0].curY - 1;
+        if(y < 0){
+            std::cout << "Bad command. No free space!" << std::endl;
+            return;
+        }
+    }
+    if(command == "bottom"){
+        y = players[0].curY + 1;
+        if(y > 39){
+            std::cout << "Bad command. No free space!" << std::endl;
+            return;
+        }
+    }
+    for(int i = 1; i < players.size(); ++i){
+        if(players[i].curX == players[0].curX && players[i].curY == players[0].curY){
+
+        }
     }
 }
 #endif //HOMEWORK21_5_4_MAIN_H

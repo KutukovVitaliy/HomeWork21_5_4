@@ -6,10 +6,17 @@ int main() {
     std::string fileNameToSaveGame = "../game.bin", command;
     std::vector<player> players;
     player tmpPlayer;
-    bool correctInput;
+    bool correctInput, endGame;
     std::vector<std::string> commandVector{"left", "right", "top", "bottom", "save", "load"};
-    std::cout << "Input your name: ";
-    std::cin >> tmpPlayer.name;
+    do{
+        correctInput = true;
+        std::cout << "Input your name(max 30 characters: ";
+        std::cin >> tmpPlayer.name;
+        if(tmpPlayer.name.size() > 30){
+            correctInput = false;
+            std::cout << "Bad input. Try again!" << std::endl;
+        }
+    }while (!correctInput);
     tmpPlayer.enemy = false;
     do{
         correctInput = true;
@@ -59,19 +66,23 @@ int main() {
 
     players.push_back(tmpPlayer);
     GenerateEnemy(players);
-    DisplayPole(players);
     do{
-        correctInput = true;
-        std::cout << "Input the command (left, right, top, bottom, save, load): ";
-        std::cin >> command;
-        correctInput = CheckCommand(commandVector, command);
-        if(!correctInput)std::cout << "Bad command! Try again!" << std::endl;
-    } while (!correctInput);
-    if(command == "save"){
-        if(!SaveGame(players, fileNameToSaveGame)) std::cout << "Can't save game to file!" << std::endl;
-    }
-    if(command == "load"){
-        if(!LoadGame(players, fileNameToSaveGame)) std::cout << "Can't save game to file!" << std::endl;
-    }
+        DisplayPole(players);
+        do{
+            endGame = false;
+            correctInput = true;
+            std::cout << "Input the command (left, right, top, bottom, save, load): ";
+            std::cin >> command;
+            correctInput = CheckCommand(commandVector, command);
+            if(!correctInput)std::cout << "Bad command! Try again!" << std::endl;
+        } while (!correctInput);
+        if(command == "save"){
+            if(!SaveGame(players, fileNameToSaveGame)) std::cout << "Can't save game to file!" << std::endl;
+        }
+        if(command == "load"){
+            if(!LoadGame(players, fileNameToSaveGame)) std::cout << "Can't load game from file!" << std::endl;
+        }
+
+    }while(!endGame);
     return 0;
 }
