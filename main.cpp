@@ -99,9 +99,9 @@ int main() {
     }while(!endGame);
     DisplayPole(players,curError,errStr);
     std::cout << "Game over! ";
-    if(players[0].health <= 0) std::cout << "The player won!" << std::endl;
+    if(players[0].health > 0) std::cout << "The player won!" << std::endl;
     else
         std::cout << "The player lost!" << std::endl;
-    DisplayPole(players,curError,errStr);
+
     return 0;
 }
