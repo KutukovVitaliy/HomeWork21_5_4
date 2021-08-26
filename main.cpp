@@ -3,11 +3,14 @@
 
 int main() {
 
-    std::string fileNameToSaveGame = "../game.bin", command;
+    std::string fileNameToSaveGame = "../game.bin", command, errStr;
     std::vector<player> players;
+
     player tmpPlayer;
-    bool correctInput, endGame;
+    bool correctInput, endGame, curError;
     std::vector<std::string> commandVector{"left", "right", "top", "bottom", "save", "load"};
+    std::cout <<  "\033[2J";
+    std::cout <<  "\033[H";
     do{
         correctInput = true;
         std::cout << "Input your name(max 30 characters: ";
@@ -47,18 +50,18 @@ int main() {
     }while(!correctInput);
     do{
         correctInput = true;
-        std::cout << "Input your X coordinate (0 - 39):";
+        std::cout << "Input your X coordinate (0 - " << MAX_X-1 << "):";
         std::cin >> tmpPlayer.curX;
-        if(tmpPlayer.curX < 0 || tmpPlayer.curX > 39){
+        if(tmpPlayer.curX < 0 || tmpPlayer.curX > MAX_X-1){
             std::cout << "Bad input!. Try again!" << std::endl;
             correctInput =false;
         }
     }while(!correctInput);
     do{
         correctInput = true;
-        std::cout << "Input your Y coordinate (0 - 39):";
+        std::cout << "Input your Y coordinate (0 - " << MAX_Y-1 << "):";
         std::cin >> tmpPlayer.curY;
-        if(tmpPlayer.curY < 0 || tmpPlayer.curY > 39){
+        if(tmpPlayer.curY < 0 || tmpPlayer.curY > MAX_Y-1){
             std::cout << "Bad input!. Try again!" << std::endl;
             correctInput =false;
         }
@@ -67,24 +70,38 @@ int main() {
     players.push_back(tmpPlayer);
     GenerateEnemy(players);
     do{
-        DisplayPole(players);
+        DisplayPole(players,curError,errStr);
         do{
             endGame = false;
             correctInput = true;
             std::cout << "Input the command (left, right, top, bottom, save, load): ";
             std::cin >> command;
             correctInput = CheckCommand(commandVector, command);
-            if(!correctInput)std::cout << "Bad command! Try again!" << std::endl;
+            if(!correctInput) std::cout << "Bad command! Try again!" << std::endl;
         } while (!correctInput);
         if(command == "save"){
-            if(!SaveGame(players, fileNameToSaveGame)) std::cout << "Can't save game to file!" << std::endl;
+            if(!SaveGame(players, fileNameToSaveGame)){
+                curError = true;
+                errStr = "Can't save game to file!";
+            }
         }
         if(command == "load"){
-            if(!LoadGame(players, fileNameToSaveGame)) std::cout << "Can't load game from file!" << std::endl;
+            if(!LoadGame(players, fileNameToSaveGame)) {
+                curError = true;
+                errStr = "Can't load game to file!";
+            }
         }
-        ExecuteCommand(command, players);
-        DisplayPole(players);
+        ExecuteCommand(command, players,curError,errStr);
+        //DisplayPole(players);
+        CheckEndGame(endGame, players);
+        GenerateStepsEnemy(players);
         CheckEndGame(endGame, players);
     }while(!endGame);
+    DisplayPole(players,curError,errStr);
+    std::cout << "Game over! ";
+    if(players[0].health <= 0) std::cout << "The player won!" << std::endl;
+    else
+        std::cout << "The player lost!" << std::endl;
+    DisplayPole(players,curError,errStr);
     return 0;
 }
